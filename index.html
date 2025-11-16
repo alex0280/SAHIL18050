@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symmetric Key Cryptography | Internet Technology</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+        
+        nav {
+            background-color: var(--dark);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 1rem 0;
+        }
+        
+        nav li {
+            margin: 0 1.5rem;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--secondary);
+        }
+        
+        section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        h1, h2, h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 0.5rem;
+        }
+        
+        h3 {
+            font-size: 1.4rem;
+            color: var(--secondary);
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        .intro {
+            font-size: 1.1rem;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+        
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .algorithm-demo {
+            background-color: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+        
+        .demo-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        input, select, button {
+            padding: 0.7rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--primary);
+        }
+        
+        .result {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .comparison-table th {
+            background-color: var(--light);
+            color: var(--primary);
+        }
+        
+        .comparison-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .visualization {
+            background-color: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+        
+        .visual-box {
+            display: inline-block;
+            width: 100px;
+            height: 60px;
+            line-height: 60px;
+            background-color: var(--secondary);
+            color: white;
+            margin: 0 10px;
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .visual-arrow {
+            display: inline-block;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav li {
+                margin: 0.5rem 0;
+            }
+            
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Symmetric Key Cryptography</h1>
+            <p class="intro">A comprehensive study of symmetric encryption algorithms and their applications in internet technology</p>
+        </div>
+    </header>
+    
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#algorithms">Algorithms</a></li>
+                <li><a href="#demo">Interactive Demo</a></li>
+                <li><a href="#applications">Applications</a></li>
+                <li><a href="#comparison">Comparison</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <section id="introduction">
+            <h2>Introduction to Symmetric Key Cryptography</h2>
+            <p>Symmetric key cryptography, also known as secret key cryptography, is a cryptographic method where the same key is used for both encryption and decryption of data. This approach requires that both the sender and receiver have access to the same secret key.</p>
+            
+            <div class="visualization">
+                <div class="visual-box">Plaintext</div>
+                <div class="visual-arrow">→</div>
+                <div class="visual-box" style="background-color: var(--accent);">Encryption</div>
+                <div class="visual-arrow">→</div>
+                <div class="visual-box">Ciphertext</div>
+                <div class="visual-arrow">→</div>
+                <div class="visual-box" style="background-color: var(--success);">Decryption</div>
+                <div class="visual-arrow">→</div>
+                <div class="visual-box">Plaintext</div>
+                <p style="margin-top: 1rem;">Same key used for both encryption and decryption</p>
+            </div>
+            
+            <p>The security of symmetric key cryptography relies entirely on keeping the key secret. If an unauthorized party gains access to the key, they can decrypt all messages encrypted with that key.</p>
+            
+            <h3>Key Characteristics</h3>
+            <ul>
+                <li><strong>Speed:</strong> Symmetric algorithms are generally faster than asymmetric algorithms</li>
+                <li><strong>Key Management:</strong> Requires secure key distribution between parties</li>
+                <li><strong>Confidentiality:</strong> Provides strong confidentiality for data at rest and in transit</li>
+                <li><strong>Usage:</strong> Commonly used for bulk data encryption</li>
+            </ul>
+        </section>
+        
+        <section id="algorithms">
+            <h2>Common Symmetric Key Algorithms</h2>
+            <div class="card-container">
+                <div class="card">
+                    <h3>Data Encryption Standard (DES)</h3>
+                    <p>Developed in the 1970s, DES was one of the first modern symmetric encryption algorithms. It uses a 56-bit key, which is now considered insecure against brute-force attacks.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Advanced Encryption Standard (AES)</h3>
+                    <p>AES is the current standard for symmetric encryption, adopted by the U.S. government. It supports key sizes of 128, 192, or 256 bits and is widely used in various applications.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Triple DES (3DES)</h3>
+                    <p>An enhancement of DES that applies the DES algorithm three times to each data block, effectively increasing the key size and security. However, it's slower than AES.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Blowfish</h3>
+                    <p>A symmetric block cipher designed in 1993 as a replacement for DES. It uses a variable-length key from 32 to 448 bits and is known for its speed and security.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="demo">
+            <h2>Interactive Encryption Demo</h2>
+            <p>Try out a simplified simulation of symmetric key encryption below. This demonstration shows how the same key is used for both encryption and decryption.</p>
+            
+            <div class="algorithm-demo">
+                <div class="demo-controls">
+                    <input type="text" id="plaintext" placeholder="Enter text to encrypt" value="Hello, World!">
+                    <input type="text" id="key" placeholder="Encryption key" value="mySecretKey123">
+                    <select id="algorithm">
+                        <option value="simple">Simple Substitution</option>
+                        <option value="caesar">Caesar Cipher</option>
+                    </select>
+                    <button id="encrypt-btn">Encrypt</button>
+                    <button id="decrypt-btn">Decrypt</button>
+                </div>
+                
+                <div class="result">
+                    <h4>Result:</h4>
+                    <p id="result-text">Enter text and click encrypt to see the result</p>
+                </div>
+            </div>
+            
+            <h3>How It Works</h3>
+            <p>This demo uses a simplified version of symmetric encryption. In real-world applications, algorithms like AES use complex mathematical operations to ensure security.</p>
+        </section>
+        
+        <section id="applications">
+            <h2>Applications in Internet Technology</h2>
+            <p>Symmetric key cryptography plays a crucial role in securing various aspects of internet technology:</p>
+            
+            <div class="card-container">
+                <div class="card">
+                    <h3>Secure Communication (TLS/SSL)</h3>
+                    <p>Symmetric encryption is used in TLS/SSL protocols to encrypt data transmitted between web browsers and servers, protecting sensitive information like passwords and credit card details.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Virtual Private Networks (VPNs)</h3>
+                    <p>VPNs use symmetric encryption to create secure tunnels for data transmission over public networks, ensuring privacy and confidentiality for remote users.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>File and Disk Encryption</h3>
+                    <p>Tools like BitLocker and FileVault use symmetric encryption to protect data at rest, preventing unauthorized access to stored information.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Database Security</h3>
+                    <p>Sensitive database fields are often encrypted using symmetric algorithms to protect personally identifiable information (PII) and other confidential data.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="comparison">
+            <h2>Symmetric vs. Asymmetric Cryptography</h2>
+            <p>Understanding the differences between symmetric and asymmetric cryptography helps in selecting the right approach for specific applications.</p>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Symmetric Cryptography</th>
+                        <th>Asymmetric Cryptography</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Keys Used</td>
+                        <td>Single shared key</td>
+                        <td>Key pair (public and private)</td>
+                    </tr>
+                    <tr>
+                        <td>Speed</td>
+                        <td>Faster</td>
+                        <td>Slower</td>
+                    </tr>
+                    <tr>
+                        <td>Key Distribution</td>
+                        <td>Challenging</td>
+                        <td>Easier (public keys can be shared)</td>
+                    </tr>
+                    <tr>
+                        <td>Use Cases</td>
+                        <td>Bulk data encryption</td>
+                        <td>Key exchange, digital signatures</td>
+                    </tr>
+                    <tr>
+                        <td>Examples</td>
+                        <td>AES, DES, Blowfish</td>
+                        <td>RSA, ECC, DSA</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Hybrid Cryptosystems</h3>
+            <p>Modern secure communication systems often use a combination of both symmetric and asymmetric cryptography:</p>
+            <ul>
+                <li>Asymmetric cryptography is used for secure key exchange</li>
+                <li>Symmetric cryptography is used for bulk data encryption</li>
+                <li>This approach combines the strengths of both methods</li>
+            </ul>
+        </section>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>College Project - Study of Symmetric Key Cryptography in Internet Technology</p>
+            <p>Sahil Salvi 18050</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const encryptBtn = document.getElementById('encrypt-btn');
+            const decryptBtn = document.getElementById('decrypt-btn');
+            const resultText = document.getElementById('result-text');
+            
+            // Simple substitution cipher
+            function simpleSubstitution(text, key, encrypt = true) {
+                let result = '';
+                const keySum = key.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+                
+                for (let i = 0; i < text.length; i++) {
+                    const charCode = text.charCodeAt(i);
+                    if (encrypt) {
+                        result += String.fromCharCode(charCode + (keySum % 26));
+                    } else {
+                        result += String.fromCharCode(charCode - (keySum % 26));
+                    }
+                }
+                
+                return result;
+            }
+            
+            // Caesar cipher
+            function caesarCipher(text, key, encrypt = true) {
+                let result = '';
+                const shift = key.length % 26;
+                
+                for (let i = 0; i < text.length; i++) {
+                    let charCode = text.charCodeAt(i);
+                    
+                    // Only shift alphabetic characters
+                    if (charCode >= 65 && charCode <= 90) { // Uppercase
+                        if (encrypt) {
+                            charCode = ((charCode - 65 + shift) % 26) + 65;
+                        } else {
+                            charCode = ((charCode - 65 - shift + 26) % 26) + 65;
+                        }
+                    } else if (charCode >= 97 && charCode <= 122) { // Lowercase
+                        if (encrypt) {
+                            charCode = ((charCode - 97 + shift) % 26) + 97;
+                        } else {
+                            charCode = ((charCode - 97 - shift + 26) % 26) + 97;
+                        }
+                    }
+                    
+                    result += String.fromCharCode(charCode);
+                }
+                
+                return result;
+            }
+            
+            encryptBtn.addEventListener('click', function() {
+                const plaintext = document.getElementById('plaintext').value;
+                const key = document.getElementById('key').value;
+                const algorithm = document.getElementById('algorithm').value;
+                
+                if (!plaintext || !key) {
+                    resultText.textContent = 'Please enter both text and key';
+                    return;
+                }
+                
+                let ciphertext;
+                if (algorithm === 'simple') {
+                    ciphertext = simpleSubstitution(plaintext, key, true);
+                } else if (algorithm === 'caesar') {
+                    ciphertext = caesarCipher(plaintext, key, true);
+                }
+                
+                resultText.textContent = Ciphertext: ${ciphertext};
+            });
+            
+            decryptBtn.addEventListener('click', function() {
+                const ciphertext = document.getElementById('plaintext').value;
+                const key = document.getElementById('key').value;
+                const algorithm = document.getElementById('algorithm').value;
+                
+                if (!ciphertext || !key) {
+                    resultText.textContent = 'Please enter both text and key';
+                    return;
+                }
+                
+                let plaintext;
+                if (algorithm === 'simple') {
+                    plaintext = simpleSubstitution(ciphertext, key, false);
+                } else if (algorithm === 'caesar') {
+                    plaintext = caesarCipher(ciphertext, key, false);
+                }
+                
+                resultText.textContent = Decrypted text: ${plaintext};
+            });
+        });
+    </script>
+</body>
+</html>
